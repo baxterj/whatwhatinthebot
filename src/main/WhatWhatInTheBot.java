@@ -1,65 +1,41 @@
 package main;
 
 import java.awt.Graphics2D;
-
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import robocode.AdvancedRobot;
 import robocode.HitWallEvent;
+import robocode.MoveCompleteCondition;
 import robocode.Rules;
 import robocode.ScannedRobotEvent;
-import robocode.TurnCompleteCondition;
 
 public class WhatWhatInTheBot extends AdvancedRobot {
 
-    boolean initializeState;
+    private static final int MOVE_STRATEGY_THRESHOLD = 3;
     int direction = 1;
     String targetName;
+    double moveAmount;
     
     Map<String, Enemy> enemies = new HashMap<>();
     
     public void run() {
         setAdjustRadarForGunTurn(true);
         setTurnRadarLeft(Double.POSITIVE_INFINITY);
-        if (initializeState) { // panic mode until we find a bot
-            setAhead(1000);
-            setTurnRight(90);
-            waitFor(new TurnCompleteCondition(this));
-        } else {
-            // NADA
-        }
+        moveAmount = Math.max(getBattleFieldWidth(), getBattleFieldHeight());
         while (true) {
             doMove();
-            doRadar();
             doGun();
             execute();
         }
     }
-    
-    private void doRadar() {
-        // TODO Auto-generated method stub
-        
-    }
 
     public void onHitWall(HitWallEvent e) {
-        reverseDirection();
-    }
-
-    public void reverseDirection() {
-        this.direction = -this.direction;
+        if (enemies.size() > MOVE_STRATEGY_THRESHOLD) {
+            this.direction = -this.direction;
+        }
     }
 
     public void onScannedRobot(ScannedRobotEvent e) {
-//        this.initializeState = false;
-//        if (e.getEnergy() <= 0) {
-//            this.targetName = null;
-//        }
-//        if (targetName == null) {
-//            this.targetName = e.getName();
-//        } else if (e.getName().equals(this.targetName)) {
-//            doMove();
-//            doGun(e);
-//        }
         if (e.getEnergy() <= 0) {
             enemies.remove(e.getName());
         } else {
@@ -73,26 +49,34 @@ public class WhatWhatInTheBot extends AdvancedRobot {
     }
     
     public void doMove() {
-        Enemy e = getEnemy();
-        if(e != null) {
-            setAhead(e.getDistance() * this.direction);
-            setTurnRight(e.getBearing());
+        if (enemies.size() > MOVE_STRATEGY_THRESHOLD) {
+            ahead(moveAmount);
+            turnRight(90);
+        } else {
+            Enemy e = getEnemy();
+            System.out.println(e);
+            if(e != null) {
+                setAhead(e.getDistance() * this.direction);
+                setTurnRight(e.getBearing());
+            }
         }
-        
-        
     }
 
     private Enemy getEnemy() {
-        return enemies.get(selectOptimumTarget()); 
+        return enemies.get(selectOptimumTarget());
     }
 
 
     public void doGun() {
-//        if (e.getDistance() < 1000 && e.getDistance() > 150) {
-//            fire((1000 - e.getDistance()) / Rules.MAX_BULLET_POWER);
-//        } else if (e.getDistance() >= 150) {
-//            fire(Rules.MAX_BULLET_POWER);
+//        Enemy e = getEnemy();
+//        if (e != null) {
+//            if (e.getDistance() < 1000 && e.getDistance() > 150) {
+//                fire((1000 - e.getDistance()) / Rules.MAX_BULLET_POWER);
+//            } else if (e.getDistance() >= 150) {
+//                fire(Rules.MAX_BULLET_POWER);
+//            }
 //        }
+        
     }
     
     public void onPaint(Graphics2D g) {
@@ -108,6 +92,7 @@ public class WhatWhatInTheBot extends AdvancedRobot {
         for (String name : enemies.keySet()) {
             Enemy enemy = enemies.get(name);
             if (enemy.getEnergy() > 0) { // only consider alive robots
+                System.out.println("dist:" + enemy.getDistance() + " ener:" + enemy.getEnergy());
                 double score = enemy.getDistance() * enemy.getEnergy();// TODO scale energy and distance
                 if (score < bestScore) {
                     bestScore = score;
