@@ -5,7 +5,7 @@ import robocode.Rules;
 import robocode.ScannedRobotEvent;
 import robocode.TurnCompleteCondition;
 
-public class MyBot extends AdvancedRobot {
+public class WhatWhatInTheBot extends AdvancedRobot {
 
     boolean initializeState;
     
