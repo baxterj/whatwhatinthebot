@@ -80,7 +80,7 @@ public class WhatWhatInTheBot extends AdvancedRobot {
     }
 
     private Enemy getEnemy() {
-        return null; 
+        return enemies.get(selectOptimumTarget()); 
     }
 
 
@@ -96,6 +96,24 @@ public class WhatWhatInTheBot extends AdvancedRobot {
         for(Enemy enemy : enemies.values()) {
             enemy.draw(g, getTime());
         }
+    }
+    
+    public String selectOptimumTarget() {
+        String bestTarget = null;
+        double bestScore = 0;
+        
+        for (String name : enemies.keySet()) {
+            Enemy enemy = enemies.get(name);
+            if (enemy.getEnergy() > 0) { // only consider alive robots
+                double score = enemy.getDistance() * enemy.getEnergy();// TODO scale energy and distance
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestTarget = name;
+                }
+            }
+            
+        }
+        return bestTarget;
     }
     
     public class Enemy {
