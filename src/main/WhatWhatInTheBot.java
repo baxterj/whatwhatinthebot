@@ -10,6 +10,7 @@ public class WhatWhatInTheBot extends AdvancedRobot {
 
     boolean initializeState;
     int direction = 1;
+    String targetName;
     
     public void run() {
         setAdjustRadarForGunTurn(true);
@@ -33,13 +34,23 @@ public class WhatWhatInTheBot extends AdvancedRobot {
 
     public void onScannedRobot(ScannedRobotEvent e) {
         this.initializeState = false;
-        doMove(e);
-        doGun(e);
+        if (e.getEnergy() <= 0) {
+            this.targetName = null;
+        }
+        if (targetName == null) {
+            this.targetName = e.getName();
+        } else if (e.getName().equals(this.targetName)) {
+            doMove(e);
+            doGun(e);
+        }
+        
     }
     
     public void doMove(ScannedRobotEvent e) {
         setAhead(e.getDistance() * this.direction);
         setTurnRight(e.getBearing());
+        
+        
     }
 
     public void doGun(ScannedRobotEvent e) {
