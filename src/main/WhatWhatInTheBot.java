@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import robocode.AdvancedRobot;
 import robocode.HitWallEvent;
-import robocode.MoveCompleteCondition;
-import robocode.Rules;
 import robocode.ScannedRobotEvent;
 
 public class WhatWhatInTheBot extends AdvancedRobot {
@@ -54,7 +52,6 @@ public class WhatWhatInTheBot extends AdvancedRobot {
             turnRight(90);
         } else {
             Enemy e = getEnemy();
-            System.out.println(e);
             if(e != null) {
                 setAhead(e.getDistance() * this.direction);
                 setTurnRight(e.getBearing());
@@ -87,12 +84,10 @@ public class WhatWhatInTheBot extends AdvancedRobot {
     
     public String selectOptimumTarget() {
         String bestTarget = null;
-        double bestScore = 0;
-        
+        double bestScore = Double.MAX_VALUE;
         for (String name : enemies.keySet()) {
             Enemy enemy = enemies.get(name);
             if (enemy.getEnergy() > 0) { // only consider alive robots
-                System.out.println("dist:" + enemy.getDistance() + " ener:" + enemy.getEnergy());
                 double score = enemy.getDistance() * enemy.getEnergy();// TODO scale energy and distance
                 if (score < bestScore) {
                     bestScore = score;
