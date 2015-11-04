@@ -117,6 +117,13 @@ public class WhatWhatInTheBot extends AdvancedRobot {
         public double getDistance() {
             return distance;
         }
+        
+        public double getX() {
+            return 0d;
+        }
+        public double getY()) {
+            return 0d;
+        }
     }
 
 }
