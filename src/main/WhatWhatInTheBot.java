@@ -60,13 +60,16 @@ public class WhatWhatInTheBot extends AdvancedRobot {
 //            doMove();
 //            doGun(e);
 //        }
-        if(enemies.containsKey(e.getName())) {
-            Enemy enemy = enemies.get(e.getName());
-            enemy.update(e, this);
-        }else {
-            enemies.put(e.getName(), new Enemy(e));
+        if (e.getEnergy() <= 0) {
+            enemies.remove(e.getName());
+        } else {
+            if(enemies.containsKey(e.getName())) {
+                Enemy enemy = enemies.get(e.getName());
+                enemy.update(e, this);
+            }else {
+                enemies.put(e.getName(), new Enemy(e));
+            }
         }
-        
     }
     
     public void doMove() {
