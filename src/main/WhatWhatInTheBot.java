@@ -26,8 +26,11 @@ public class WhatWhatInTheBot extends AdvancedRobot {
         
         setAhead(e.getDistance());
         setTurnRight(e.getBearing());
-        if (e.getDistance() < 300) {
-            fire(Rules.MAX_BULLET_POWER / 2);
+        
+        if (e.getDistance() < 1000 && e.getDistance() > 150) {
+            fire((1000 - e.getDistance()) / Rules.MAX_BULLET_POWER);
+        } else if (e.getDistance() >= 150) {
+            fire(Rules.MAX_BULLET_POWER);
         }
     }
 }
