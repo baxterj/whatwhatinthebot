@@ -27,6 +27,12 @@ public class WhatWhatInTheBot extends AdvancedRobot {
         } else {
             // NADA
         }
+        while (true) {
+            doMove();
+            doRadar();
+            doGun();
+            
+        }
     }
     
     public void onHitWall(HitWallEvent e) {
@@ -51,11 +57,17 @@ public class WhatWhatInTheBot extends AdvancedRobot {
         
     }
     
-    public void doMove(ScannedRobotEvent e) {
+    public void doMove() {
+        Enemy e = getEnemy();
         setAhead(e.getDistance() * this.direction);
         setTurnRight(e.getBearing());
         
         
+    }
+
+    private Enemy getEnemy() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public void doGun(ScannedRobotEvent e) {
