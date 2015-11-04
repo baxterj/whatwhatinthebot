@@ -1,7 +1,8 @@
 package main;
 
-import java.util.Map;
+import java.awt.Graphics2D;
 
+import java.util.Map;
 import java.util.HashMap;
 import robocode.AdvancedRobot;
 import robocode.HitWallEvent;
@@ -31,10 +32,15 @@ public class WhatWhatInTheBot extends AdvancedRobot {
             doMove();
             doRadar();
             doGun();
-            
+            execute();
         }
     }
     
+    private void doRadar() {
+        // TODO Auto-generated method stub
+        
+    }
+
     public void onHitWall(HitWallEvent e) {
         reverseDirection();
     }
@@ -44,47 +50,63 @@ public class WhatWhatInTheBot extends AdvancedRobot {
     }
 
     public void onScannedRobot(ScannedRobotEvent e) {
-        this.initializeState = false;
-        if (e.getEnergy() <= 0) {
-            this.targetName = null;
-        }
-        if (targetName == null) {
-            this.targetName = e.getName();
-        } else if (e.getName().equals(this.targetName)) {
-            doMove(e);
-            doGun(e);
+//        this.initializeState = false;
+//        if (e.getEnergy() <= 0) {
+//            this.targetName = null;
+//        }
+//        if (targetName == null) {
+//            this.targetName = e.getName();
+//        } else if (e.getName().equals(this.targetName)) {
+//            doMove();
+//            doGun(e);
+//        }
+        if(enemies.containsKey(e.getName())) {
+            Enemy enemy = enemies.get(e.getName());
+            enemy.update(e, this);
+        }else {
+            enemies.put(e.getName(), new Enemy(e));
         }
         
     }
     
     public void doMove() {
         Enemy e = getEnemy();
-        setAhead(e.getDistance() * this.direction);
-        setTurnRight(e.getBearing());
+        if(e != null) {
+            setAhead(e.getDistance() * this.direction);
+            setTurnRight(e.getBearing());
+        }
         
         
     }
 
     private Enemy getEnemy() {
-        // TODO Auto-generated method stub
-        return null;
+        return null; 
     }
 
-    public void doGun(ScannedRobotEvent e) {
-        if (e.getDistance() < 1000 && e.getDistance() > 150) {
-            fire((1000 - e.getDistance()) / Rules.MAX_BULLET_POWER);
-        } else if (e.getDistance() >= 150) {
-            fire(Rules.MAX_BULLET_POWER);
-        }
+
+    public void doGun() {
+//        if (e.getDistance() < 1000 && e.getDistance() > 150) {
+//            fire((1000 - e.getDistance()) / Rules.MAX_BULLET_POWER);
+//        } else if (e.getDistance() >= 150) {
+//            fire(Rules.MAX_BULLET_POWER);
+//        }
     }
     
+    public void onPaint(Graphics2D g) {
+        for(Enemy enemy : enemies.values()) {
+            enemy.draw(g, getTime());
+        }
+    }
     
     public class Enemy {
         double bearing;
         double velocity;
         double energy;
-        String name;
+        final String name;
         double distance;
+        
+        double x;
+        double y;
 
         public Enemy(ScannedRobotEvent e){
             bearing = e.getBearing();
@@ -94,8 +116,17 @@ public class WhatWhatInTheBot extends AdvancedRobot {
             distance = e.getDistance();
         }
         
-        public void update(ScannedRobotEvent e) {
+        public void draw(Graphics2D g, long time) {
             
+            g.fillRect((int)x - 20, (int)y - 20, 40, 40);
+            
+        }
+
+        public void update(ScannedRobotEvent e, AdvancedRobot whatWhatInTheBot) {
+            this.bearing = e.getBearing();
+            this.velocity = e.getVelocity();
+            this.energy = e.getEnergy();
+            this.distance = e.getDistance();
         }
 
         public double getBearing() {
@@ -119,10 +150,10 @@ public class WhatWhatInTheBot extends AdvancedRobot {
         }
         
         public double getX() {
-            return 0d;
+            return x;
         }
-        public double getY()) {
-            return 0d;
+        public double getY() {
+            return y;
         }
     }
 
